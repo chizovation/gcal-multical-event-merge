@@ -1,14 +1,20 @@
-const getSetting = () => new Promise(res => chrome.storage.local.get('disabled', (s) => res(s.disabled)));
-const setIcon = (disabled) => chrome.browserAction.setIcon({
-  path: disabled ? "icon-disabled.png" : "icon.png"
+const getSetting = () =>
+  chrome.storage.local.get("disabled").then((result) => result.disabled);
+
+const setIcon = (disabled) =>
+  chrome.action.setIcon({
+    path: disabled ? "icon-disabled.png" : "icon.png",
+  });
+
+// Initialize icon on install
+chrome.runtime.onInstalled.addListener(() => {
+  getSetting().then(setIcon);
 });
 
-getSetting().then(setIcon);
-
-chrome.browserAction.onClicked.addListener(function(tab) {
-  getSetting().then(disabled => {
-    const toggled = !disabled;
-    chrome.storage.local.set({ 'disabled': toggled });
-    setIcon(toggled);
-  })
+// Handle icon clicks
+chrome.action.onClicked.addListener(async (tab) => {
+  const disabled = await getSetting();
+  const toggled = !disabled;
+  await chrome.storage.local.set({ disabled: toggled });
+  setIcon(toggled);
 });
