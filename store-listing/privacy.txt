@@ -5,9 +5,9 @@ This extension's single purpose is to visually merge duplicate events that appea
 
 Permission Justifications:
 
-1. Host Permissions (calendar.google.com, www.google.com/calendar):
-- These permissions are required to access and modify the visual display of Google Calendar pages
-- The extension only runs on Google Calendar pages to identify and merge duplicate events
+1. Content Script Matches (calendar.google.com, www.google.com/calendar):
+- The extension only needs to run on Google Calendar pages to modify their visual display
+- No additional host permissions are required as we only modify the page content
 - No data is collected or transmitted outside of the Google Calendar interface
 
 2. Storage Permission:
