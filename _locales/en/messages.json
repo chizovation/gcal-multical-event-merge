@@ -1,10 +1,10 @@
 {
   "appName": {
-    "message": "Event Merge for Google Calendar™",
+    "message": "Event Merge for Google Calendar™ (MV3)",
     "description": "The title of the application, displayed in the web store."
   },
   "appDesc": {
-    "message": "Chrome extension that visually merges the same event on multiple Google Calendars into one event.",
+    "message": "Chrome extension that visually merges the same event on multiple Google Calendars into one event. Updated for Manifest V3.",
     "description": "The description of the application, displayed in the web store."
   }
 }
