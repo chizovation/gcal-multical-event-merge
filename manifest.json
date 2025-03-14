@@ -16,10 +16,6 @@
     }
   ],
   "permissions": ["storage"],
-  "host_permissions": [
-    "https://www.google.com/calendar/*",
-    "https://calendar.google.com/calendar/*"
-  ],
   "background": {
     "service_worker": "background.js"
   },
