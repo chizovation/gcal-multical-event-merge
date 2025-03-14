@@ -1,0 +1,30 @@
+Privacy Policy and Permission Justification
+
+Single Purpose Description:
+This extension's single purpose is to visually merge duplicate events that appear across multiple Google Calendars into a single, unified event display. This makes it easier for users to view events that are shared across multiple calendars without the visual clutter of duplicate entries.
+
+Permission Justifications:
+
+1. Host Permissions (calendar.google.com, www.google.com/calendar):
+- These permissions are required to access and modify the visual display of Google Calendar pages
+- The extension only runs on Google Calendar pages to identify and merge duplicate events
+- No data is collected or transmitted outside of the Google Calendar interface
+
+2. Storage Permission:
+- Used solely to store the user's preference for whether the extension is enabled or disabled
+- No personal or calendar data is stored
+- This setting persists across browser sessions for user convenience
+
+3. Remote Code:
+- The extension does not execute any remote code
+- All code is packaged within the extension
+- The only external resources loaded are from Google Calendar itself
+
+Data Usage Compliance:
+- This extension does not collect, transmit, or store any personal information
+- No data is shared with third parties
+- The extension only modifies the visual presentation of calendar events locally in the browser
+- All operations are performed client-side
+- No analytics or tracking code is included
+
+This extension complies with all Chrome Web Store developer program policies and data usage requirements.
