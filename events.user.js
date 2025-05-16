@@ -80,16 +80,8 @@ const mergeEventElements = (events) => {
     };
     eventToKeep.style.backgroundImage = stripesGradient(colors, 10, 45);
     eventToKeep.style.backgroundSize = "initial";
-    eventToKeep.style.left =
-      Math.min.apply(
-        Math,
-        positions.map((s) => s.left)
-      ) + "px";
-    eventToKeep.style.right =
-      Math.min.apply(
-        Math,
-        positions.map((s) => s.right)
-      ) + "px";
+    eventToKeep.style.left = Math.min(...positions.map((s) => s.left)) + "px";
+    eventToKeep.style.right = Math.min(...positions.map((s) => s.right)) + "px";
     eventToKeep.style.visibility = "visible";
     eventToKeep.style.width = null;
     eventToKeep.style.border = "solid 1px #FFF";
@@ -125,7 +117,7 @@ const mergeEventElements = (events) => {
 
 const resetMergedEvents = (events) => {
   events.forEach((event) => {
-    for (var k in event.originalStyle) {
+    for (let k in event.originalStyle) {
       event.style[k] = event.originalStyle[k];
     }
     event.style.visibility = "visible";
@@ -166,15 +158,12 @@ const merge = (mainCalender) => {
 };
 
 const init = (mutationsList) => {
-  mutationsList &&
-    mutationsList
-      .map((mutation) => mutation.addedNodes[0] || mutation.target)
-      .filter(
-        (node) =>
-          node.matches &&
-          node.matches('[role="main"], [role="dialog"], [role="grid"]')
-      )
-      .map(merge);
+  mutationsList
+    ?.map((mutation) => mutation.addedNodes[0] || mutation.target)
+    .filter((node) =>
+      node.matches?.('[role="main"], [role="dialog"], [role="grid"]')
+    )
+    .map(merge);
 };
 
 setTimeout(async () => {
