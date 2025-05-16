@@ -84,9 +84,9 @@ const mergeEventElements = (events) => {
     const dropdown = document.createElement("span");
     dropdown.textContent = "🔽";
     dropdown.style.position = "absolute";
-    dropdown.style.right = "4px";
-    dropdown.style.top = "50%";
-    dropdown.style.transform = "translateY(-50%)";
+    dropdown.style.left = "4px";
+    dropdown.style.top = "4px";
+    dropdown.style.transform = "none";
     dropdown.style.cursor = "pointer";
     dropdown.style.fontSize = "14px";
     dropdown.style.opacity = "0";
