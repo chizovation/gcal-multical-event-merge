@@ -128,6 +128,33 @@ const mergeEventElements = (events) => {
       menu.style.borderRadius = "6px";
       menu.style.minWidth = "180px";
       menu.style.font = "14px Arial, sans-serif";
+      // Add close [x] button
+      const closeBtn = document.createElement("span");
+      closeBtn.textContent = "✕";
+      closeBtn.style.position = "absolute";
+      closeBtn.style.top = "6px";
+      closeBtn.style.right = "10px";
+      closeBtn.style.cursor = "pointer";
+      closeBtn.style.fontSize = "16px";
+      closeBtn.style.opacity = "0.7";
+      closeBtn.style.zIndex = "10000";
+      closeBtn.setAttribute("aria-label", "Close menu");
+      closeBtn.onmouseenter = () => {
+        closeBtn.style.opacity = "1";
+        closeBtn.style.background = isDark ? "#444" : "#eee";
+        closeBtn.style.borderRadius = "50%";
+      };
+      closeBtn.onmouseleave = () => {
+        closeBtn.style.opacity = "0.7";
+        closeBtn.style.background = "";
+        closeBtn.style.borderRadius = "";
+      };
+      closeBtn.onclick = (e) => {
+        e.stopPropagation();
+        menu.remove();
+        document.removeEventListener("mousedown", removeMenu, true);
+      };
+      menu.appendChild(closeBtn);
       // Position at dropdown
       const rect = dropdown.getBoundingClientRect();
       menu.style.top = rect.bottom + "px";
