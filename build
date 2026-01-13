@@ -1,1 +1,12 @@
-find . -path '*/.*' -prune -o -type f -print | zip ./gcal-multical-event-merge.zip -@
+#!/usr/bin/env bash
+
+# if we have jq, use it to get the version from manifest.json
+if command -v jq >/dev/null 2>&1; then
+  VERSION="v$(jq -r '.version' manifest.json)"
+else
+  VERSION="unknown"
+fi
+
+echo "Building version $VERSION"
+
+find . -path '*/.*' -prune -o -type f -print | zip ./gcal-multical-event-merge-${VERSION}.zip -@
