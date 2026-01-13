@@ -264,27 +264,36 @@ const mergeEventElements = (events) => {
     eventToKeep.style.border = "solid 1px #FFF";
 
     // Clear setting color for declined events
-    eventToKeep.querySelector('[aria-hidden="true"]').style.color = null;
+    const ariaHiddenEl = eventToKeep.querySelector('[aria-hidden="true"]');
+    if (ariaHiddenEl) {
+      ariaHiddenEl.style.color = null;
+    }
 
-    const computedSpanStyle = window.getComputedStyle(
-      eventToKeep.querySelector("span")
-    );
-    if (computedSpanStyle.color == "rgb(255, 255, 255)") {
-      eventToKeep.style.textShadow = "0px 0px 2px black";
-    } else {
-      eventToKeep.style.textShadow = "0px 0px 2px white";
+    const spanEl = eventToKeep.querySelector("span");
+    if (spanEl) {
+      const computedSpanStyle = window.getComputedStyle(spanEl);
+      if (computedSpanStyle.color == "rgb(255, 255, 255)") {
+        eventToKeep.style.textShadow = "0px 0px 2px black";
+      } else {
+        eventToKeep.style.textShadow = "0px 0px 2px white";
+      }
     }
 
     events.forEach((event) => {
       event.style.visibility = "hidden";
     });
   } else {
+    // Month view events - try to find the dot indicator
     const dots = eventToKeep.querySelector('[role="button"] div:first-child');
-    const dot = dots.querySelector("div");
-    dot.style.backgroundImage = stripesGradient(colors, 4, 90);
-    dot.style.width = colors.length * 4 + "px";
-    dot.style.borderWidth = 0;
-    dot.style.height = "8px";
+    if (dots) {
+      const dot = dots.querySelector("div");
+      if (dot) {
+        dot.style.backgroundImage = stripesGradient(colors, 4, 90);
+        dot.style.width = colors.length * 4 + "px";
+        dot.style.borderWidth = 0;
+        dot.style.height = "8px";
+      }
+    }
 
     events.forEach((event) => {
       event.style.visibility = "hidden";
@@ -315,11 +324,18 @@ const merge = (mainCalender) => {
       if (!eventTitleEls.length) {
         return;
       }
+      // Extract and normalize event title - trim whitespace and normalize to lowercase
+      // for more robust matching, especially for multi-day events that might have
+      // slightly different formatting
       let eventKey = Array.from(eventTitleEls)
-        .map((el) => el.textContent)
-        .join("")
-        .replace(/\\s+/g, "");
-      eventKey = index + eventKey + event.style.height;
+        .map((el) => el.textContent.trim())
+        .filter((text) => text.length > 0) // Filter out empty strings
+        .join(" ")
+        .toLowerCase()
+        .replace(/\s+/g, ""); // Fix regex: single backslash, not double
+      // Remove event.style.height from the key as it can vary for multi-day events
+      // on different days, preventing proper matching. Use day index + title only.
+      eventKey = index + '|' + eventKey;
       eventSets[eventKey] = eventSets[eventKey] || [];
       eventSets[eventKey].push(event);
     });
@@ -343,15 +359,48 @@ const init = (mutationsList) => {
     .map(merge);
 };
 
+// Also try to find and merge calendar directly (for cases where MutationObserver misses it)
+const findAndMergeCalendar = () => {
+  const calendarGrids = document.querySelectorAll('[role="grid"]');
+  calendarGrids.forEach((grid) => {
+    const hasGridCells = grid.querySelectorAll('[role="gridcell"]').length > 0;
+    if (hasGridCells) {
+      merge(grid);
+    }
+  });
+  // Also try role="main" as fallback
+  const mainCalendars = document.querySelectorAll('[role="main"]');
+  mainCalendars.forEach((main) => {
+    const hasGridCells = main.querySelectorAll('[role="gridcell"]').length > 0;
+    if (hasGridCells) {
+      merge(main);
+    }
+  });
+};
+
 setTimeout(async () => {
   const storage = await chrome.storage.local.get("disabled");
   console.log(`Event merge is ${storage.disabled ? "disabled" : "enabled"}`);
   if (!storage.disabled) {
-    const observer = new MutationObserver(init);
+    // Initial merge attempts with retries (calendar may load asynchronously)
+    findAndMergeCalendar();
+    setTimeout(findAndMergeCalendar, 500);
+    setTimeout(findAndMergeCalendar, 1500);
+    
+    const observer = new MutationObserver((mutationsList) => {
+      init(mutationsList);
+      // Also do a direct search after mutations, in case the mutation detection missed something
+      setTimeout(findAndMergeCalendar, 100);
+    });
     observer.observe(document.querySelector("body"), {
       childList: true,
       subtree: true,
       attributes: true,
+    });
+    
+    // Also retry on window focus (in case calendar was loaded while tab was inactive)
+    window.addEventListener("focus", () => {
+      setTimeout(findAndMergeCalendar, 100);
     });
   }
 
