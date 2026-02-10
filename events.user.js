@@ -378,6 +378,19 @@ const findAndMergeCalendar = () => {
   });
 };
 
+// Throttle how often we do a full calendar scan, to avoid re-running it
+// on every single DOM mutation in Google Calendar.
+let mergeTimeoutId = null;
+const scheduleMerge = (delay = 100) => {
+  if (mergeTimeoutId !== null) {
+    clearTimeout(mergeTimeoutId);
+  }
+  mergeTimeoutId = setTimeout(() => {
+    mergeTimeoutId = null;
+    findAndMergeCalendar();
+  }, delay);
+};
+
 setTimeout(async () => {
   const storage = await chrome.storage.local.get("disabled");
   console.log(`Event merge is ${storage.disabled ? "disabled" : "enabled"}`);
@@ -390,7 +403,7 @@ setTimeout(async () => {
     const observer = new MutationObserver((mutationsList) => {
       init(mutationsList);
       // Also do a direct search after mutations, in case the mutation detection missed something
-      setTimeout(findAndMergeCalendar, 100);
+      scheduleMerge(100);
     });
     observer.observe(document.querySelector("body"), {
       childList: true,
@@ -400,7 +413,7 @@ setTimeout(async () => {
     
     // Also retry on window focus (in case calendar was loaded while tab was inactive)
     window.addEventListener("focus", () => {
-      setTimeout(findAndMergeCalendar, 100);
+      scheduleMerge(100);
     });
   }
 
